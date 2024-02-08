@@ -71,7 +71,7 @@
 
     <abstract>
       <t>This document introduces IP Flow Information Export
-      Information Elements to identify informantion containted in the
+      Information Elements to identify informantion contaited in the
       Generic Packet Radio Service Tunneling Protocol User Plane
       header such as Tunnel Endpoint Identifier, and data contained
       in its session container extension header.</t>
