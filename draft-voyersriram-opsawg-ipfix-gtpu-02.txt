@@ -265,7 +265,7 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    ElementID:  TBD1
 
-   Description:  8-bit message type field defined in section 5.1 of
+   Description:  8-bit flags field defined in section 5.1 of
       GTP-U spec [TS.29281].
 
    Abstract Data Type:  unsigned8
