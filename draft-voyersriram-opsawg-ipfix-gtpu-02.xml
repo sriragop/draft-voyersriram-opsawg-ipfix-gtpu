@@ -241,7 +241,7 @@
           <dl>
             <dt>Description:</dt>
 
-            <dd>8-bit message type field defined in section 5.1
+            <dd>8-bit flags field defined in section 5.1
             of GTP-U spec <xref target="TS.29281"/>.</dd>
           </dl>
 
