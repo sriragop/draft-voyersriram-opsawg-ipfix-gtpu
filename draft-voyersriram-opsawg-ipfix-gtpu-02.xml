@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="std" docName="draft-voyersriram-opsawg-ipfix-gtpu-02"
+     ipr="trust200902">
+  <front>
+    <title
+    abbrev="IPFIX support for GTP-U">Export&nbsp;of&nbsp;GTP-U&nbsp;Information&nbsp;in
+    IP&nbsp;Flow&nbsp;Information&nbsp;Export&nbsp;(IPFIX)</title>
+
+    <author fullname="Daniel Voyer" initials="D" surname="Voyer">
+      <organization>Bell Canada</organization>
+
+      <address>
+        <email>daniel.voyer@bell.ca</email>
+      </address>
+    </author>
+
+    <author fullname="Sriram Gopalakrishnan" initials="S"
+            surname="Gopalakrishnan">
+      <organization>Cisco Systems</organization>
+
+      <address>
+        <postal>
+          <country>India</country>
+        </postal>
+        <email>sriragop@cisco.com</email>
+      </address>
+    </author>
+
+    <author fullname="Ralu Johny" initials="R" surname="Johny">
+      <organization>Cisco Systems</organization>
+
+      <address>
+        <postal>
+          <country>India</country>
+        </postal>
+        <email>rjohny@cisco.com</email>
+      </address>
+    </author>
+
+    <author fullname="Thomas Graf" initials="T" surname="Graf">
+      <organization>Swisscom</organization>
+
+      <address>
+        <email>thomas.graf@swisscom.com</email>
+      </address>
+    </author>
+
+    <author fullname="Benoit Claise" initials="B" surname="Claise">
+      <organization>Huawei</organization>
+      <address>
+        <email>benoit.claise@huawei.com</email>
+      </address>
+    </author>
+
+    <date year=""/>
+
+    <area>Operations and Management</area>
+
+    <workgroup>Operations</workgroup>
+
+    <abstract>
+      <t>This document introduces IP Flow Information Export
+      Information Elements to identify information contained in the
+      Generic Packet Radio Service Tunneling Protocol User Plane
+      header such as Tunnel Endpoint Identifier, and data contained
+      in its session container extension header.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section anchor="Introduction" title="Introduction">
+      <t>A dedicated header, called GPRS Tunneling Protocol Header (GTP), is
+      defined by 3GPP for use of GTP-C Control plane and GTP-U User Plane
+      <xref target="TS.29281"/> traffic of mobile subscribers.</t>
+
+      <t>This document specifies six IPFIX Information Elements (IEs)
+      <xref target="RFC7012"/> for fields within a GTP-U header. </t>
+
+      <t>These IEs are used to export the GTP-U Tunnel Endpoint Identifier
+      (TEID), QoS Flow Identifier (QFI) and PDU Type from the PDU Session
+      Container extension header.</t>
+
+      <t>Some examples are provided in Appendix A.</t>
+    </section>
+
+    <section anchor="notation" title="Terminology">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in BCP 14
+      <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when,
+      they appear in all capitals, as shown here.</t>
+
+      <t>This document makes use of the terms defined in <xref
+      target="RFC7011"/></t>
+
+      <t><list style="symbols">
+          <t>IPFIX</t>
+
+          <t>IPFIX Information Elements</t>
+
+          <t>Template</t>
+
+          <t>Template Record</t>
+
+          <t>Options Template</t>
+
+          <t>Options Template Record</t>
+
+          <t>Data Record</t>
+
+          <t>Data Set</t>
+        </list></t>
+    </section>
+
+    <section anchor="IE" title="IPFIX GTP-U Information Elements">
+      <t>This section defines IPFIX IEs corresponding to various fields in the
+      GTP-U.<list style="hanging">
+          <t hangText="gtpuFlags"><vspace blankLines="0"/> 8-bit flags field
+          defined in the GTP-U.</t>
+
+          <t hangText="gtpuMsgType"><vspace blankLines="0"/> 8-bit message
+          type field defined in the GTP-U.</t>
+
+          <t hangText="gtpuTEid"><vspace blankLines="0"/> 32-bit tunnel
+          endpoint identifier field defined in GTP-U which unambiguously
+          identifies a tunnel endpoint in the receiving GTP-U protocol
+          entity for a given UDP/IP endpoint.</t>
+
+          <t hangText="gtpuSequenceNum"><vspace blankLines="0"/> 16-bit
+          sequence number field defined in the GTP-U.</t>
+
+          <t hangText="gtpuQFI"><vspace blankLines="0"/> 8-bit QoS flow
+          identifier field defined in PDU Session Container extension header
+          of GTP-U.</t>
+
+          <t hangText="gtpuPduType"><vspace blankLines="0"/> 8-bit PDU Type
+          field defined in PDU Session Container extension header of
+          GTP-U.</t>
+        </list></t>
+    </section>
+
+    <section anchor="Sample-Use-Cases" title="Sample Use Cases">
+      <t>In order to identify the transport performance of PDU Sessions with
+      specific QoS within a slice or within a group of slices hosted on
+      the same UPF the GTP User Plane related IEs would be much helpful.</t>
+
+      <t>For example when in case of one or a couple of dedicated UPFs are
+      deployed per 5G slice, the slice is identified first using list of
+      gNodeB IPs composing the slice and list of IPs of User Plane Function
+      dedicated for the slice. The gNodeB and the User Plane Function form
+      the tunnel endpoints. Also the traffic for individual PDU session per
+      direction is identified using the GTP-U TEID, GTP-U PDU Type together
+      with above mentioned tunnel endpoints. Further the traffic for specific
+      QoS within a PDU session per direction is identified using the
+      combination of GTP-U TEID, GTP-U PDU Type and GTP-U QFI attributes. It
+      is possible that there may be multiple IP flows having the same
+      attributes.</t>
+
+      <t>In another scenario when multiple 5G slices are served by the same User
+      Plane Function, the slice is identified using a separated list of
+      gNodeB IPv6 addresses per slice. If Intermediate User Plane Function or
+      Uplink Classifier is deployed there is an addition of a GTP-U tunnel
+      between the Intermediate/Uplink-Classifier UPF and the final UPF. These
+      brings a challenge for identifying the end to end path for a certain
+      PDU session - where the GTP-U PDU Type and GTP-U QFI attributes from
+      the gNodeB and Intermediate/Uplink-Classifier UPF tunnel will be the
+      same on the Intermediate/Uplink-Classifier and final UPF tunnel,
+      however the GTP-U TEIDs will be different since this is a different
+      tunnel.</t>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document requests IANA to add the IEs listed in Table 1 below
+      to the "IPFIX Information Elements" registry
+      <xref target="RFC7012"/> available at <xref target="IANA-IPFIX"/>.</t>
+
+      <t>Table 1 lists the GTP-U IEs:</t>
+
+      <t><figure>
+          <artwork><![CDATA[
+
+     +-------+-----------------+
+     |Element| Name            |
+     |       |                 |
+     |   ID  |                 |
+     |       |                 |
+     +-------+-----------------+
+     | TBD1  | gtpuFlags       |
+     |       |                 |
+     +-------+-----------------+
+     | TBD2  | gtpuMsgType     |
+     |       |                 |
+     +-------+-----------------+
+     | TBD3  | gtpuTEid        |
+     |       |                 |
+     |       |                 |
+     +-------+-----------------+
+     | TBD4  | gtpuSequenceNum |
+     |       |                 |
+     +-------+-----------------+
+     | TBD5  | gtpuQFI         |
+     |       |                 |
+     |       |                 |
+     |       |                 |
+     |       |                 |
+     +-------+-----------------+
+     | TBD6  | gtpuPduType     |
+     |       |                 |
+     |       |                 |
+     |       |                 |
+     +-------+-----------------+
+
+  Table 1: GTP-U IEs in the "IPFIX Information Elements" Registry
+     ]]></artwork>
+        </figure></t>
+
+      <section anchor="IANAgtpuFlags" title="gtpuFlags">
+          <dl>
+            <dt>Name:</dt>
+
+            <dd>gtpuFlags</dd>
+          </dl>
+
+          <dl>
+            <dt>ElementID:</dt>
+
+            <dd>TBD1</dd>
+          </dl>
+
+          <dl>
+            <dt>Description:</dt>
+
+            <dd>8-bit message type field defined in section 5.1
+            of GTP-U spec <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Abstract Data Type:</dt>
+
+            <dd>unsigned8</dd>
+          </dl>
+
+          <dl>
+            <dt>Data Type Semantics:</dt>
+
+            <dd>flags</dd>
+          </dl>
+
+          <dl>
+            <dt>Additional Information:</dt>
+
+            <dd>Refer section 5.1 in <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Reference:</dt>
+
+            <dd>[RFC-to-be]</dd>
+          </dl>
+      </section>
+
+      <section anchor="IANAgtpuMsgType" title="gtpuMsgType">
+          <dl>
+            <dt>Name:</dt>
+
+            <dd>gtpuMsgType</dd>
+          </dl>
+
+          <dl>
+            <dt>ElementID:</dt>
+
+            <dd>TBD2</dd>
+          </dl>
+
+          <dl>
+            <dt>Description:</dt>
+
+            <dd>8-bit message type field defined in section 5.1
+            of GTP-U spec <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Abstract Data Type:</dt>
+
+            <dd>unsigned8</dd>
+          </dl>
+
+          <dl>
+            <dt>Data Type Semantics:</dt>
+
+            <dd>identifier</dd>
+          </dl>
+
+          <dl>
+            <dt>Additional Information:</dt>
+
+            <dd>Refer section 5.1 in <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Reference:</dt>
+
+            <dd>[RFC-to-be]</dd>
+          </dl>
+      </section>
+
+      <section anchor="IANAgtpuTEid" title="gtpuTEid">
+          <dl>
+            <dt>Name:</dt>
+
+            <dd>gtpuTEid</dd>
+          </dl>
+
+          <dl>
+            <dt>ElementID:</dt>
+
+            <dd>TBD3</dd>
+          </dl>
+
+          <dl>
+            <dt>Description:</dt>
+
+            <dd>32-bit tunnel endpoint identifier field defined
+            in section 5.1 of GTP-U spec <xref target="TS.29281"/>.
+            This field unambiguously identifies a tunnel
+            endpoint in the receiving GTP-U protocol entity for a
+            given UDP/IP endpoint. The receiving end side of a GTP
+            tunnel locally assigns the TEID value the transmitting
+            side has to use. The TEID values are exchanged between
+            tunnel endpoints using control plane messages.</dd>
+          </dl>
+
+          <dl>
+            <dt>Abstract Data Type:</dt>
+
+            <dd>unsigned32</dd>
+          </dl>
+
+          <dl>
+            <dt>Data Type Semantics:</dt>
+
+            <dd>identifier</dd>
+          </dl>
+
+          <dl>
+            <dt>Additional Information:</dt>
+
+            <dd>Refer section 5.1 in <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Reference:</dt>
+
+            <dd>[RFC-to-be]</dd>
+          </dl>
+      </section>
+
+      <section anchor="IANAgtpuSequenceNum" title="gtpuSequenceNum">
+          <dl>
+            <dt>Name:</dt>
+
+            <dd>gtpuSequenceNum</dd>
+          </dl>
+
+          <dl>
+            <dt>ElementID:</dt>
+
+            <dd>TBD4</dd>
+          </dl>
+
+          <dl>
+            <dt>Description:</dt>
+
+            <dd>16-bit sequence number field defined in section 5.1
+            of GTP-U spec <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Abstract Data Type:</dt>
+
+            <dd>unsigned16</dd>
+          </dl>
+
+          <dl>
+            <dt>Data Type Semantics:</dt>
+
+            <dd>identifier</dd>
+          </dl>
+
+          <dl>
+            <dt>Additional Information:</dt>
+
+            <dd>Refer <xref target="TS.29281"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Reference:</dt>
+
+            <dd>[RFC-to-be]</dd>
+          </dl>
+      </section>
+
+      <section anchor="IANAgtpuQFI" title="gtpuQFI">
+          <dl>
+            <dt>Name:</dt>
+
+            <dd>gtpuQFI</dd>
+          </dl>
+
+          <dl>
+            <dt>ElementID:</dt>
+
+            <dd>TBD5</dd>
+          </dl>
+
+          <dl>
+            <dt>Description:</dt>
+
+            <dd>8-bit QoS flow identifier field defined in PDU Session
+            Container extension header of GTP-U. This is defined in section
+            5.5.3 of PDU session spec <xref target="TS.38415"/>. This is used
+            to determine the QoS flow and QoS profile which are associated
+            with the received packet. </dd>
+          </dl>
+
+          <dl>
+            <dt>Abstract Data Type:</dt>
+
+            <dd>unsigned8</dd>
+          </dl>
+
+          <dl>
+            <dt>Data Type Semantics:</dt>
+
+            <dd>identifier</dd>
+          </dl>
+
+          <dl>
+            <dt>Additional Information:</dt>
+
+            <dd>Refer section 5.5.3 in <xref target="TS.38415"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Reference:</dt>
+
+            <dd>[RFC-to-be]</dd>
+          </dl>
+      </section>
+
+      <section anchor="IANAgtpuPduType" title="gtpuPduType">
+          <dl>
+            <dt>Name:</dt>
+
+            <dd>gtpuPduType</dd>
+          </dl>
+
+          <dl>
+            <dt>ElementID:</dt>
+
+            <dd>TBD6</dd>
+          </dl>
+
+          <dl>
+            <dt>Description:</dt>
+
+            <dd>8-bit PDU type field defined in PDU Session Container
+            extension header of GTP-U. This is defined in section
+            5.5.3 of PDU session spec <xref target="TS.38415"/>. This
+            field indicates the structure of the PDU session UP frame.</dd>
+          </dl>
+
+          <dl>
+            <dt>Abstract Data Type:</dt>
+
+            <dd>unsigned8</dd>
+          </dl>
+
+          <dl>
+            <dt>Data Type Semantics:</dt>
+
+            <dd>identifier</dd>
+          </dl>
+
+          <dl>
+            <dt>Additional Information:</dt>
+
+            <dd>Refer section 5.5.3 in <xref target="TS.38415"/>.</dd>
+          </dl>
+
+          <dl>
+            <dt>Reference:</dt>
+
+            <dd>[RFC-to-be]</dd>
+          </dl>
+      </section>
+
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>The authors would like to thank Ketan Talaulikar and
+      Dhananjay Patki for their reviews and valuable comments.</t>
+    </section>
+
+    <section anchor="Contributors" title="Contributors">
+      <contact fullname="Cristian Staicu">
+        <organization showOnFrontPage="true">Bell Canada</organization>
+        <address>
+          <email>cristian.staicu@bell.ca</email>
+        </address>
+      </contact>
+      <contact fullname="Kandhla Chandi">
+        <organization showOnFrontPage="true">Bell Canada</organization>
+        <address>
+          <email>kandhla.chandi@bell.ca</email>
+        </address>
+      </contact>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>There exists no extra security considerations regarding allocation of
+      these IPFIX IEs compared to <xref target="RFC7012"/>.</t>
+
+      <t>The IEs described in this document export GTP user plane data metrics
+      on how packets are being forwarded in 5G network. Applications and
+      operators using the IEs described in this document must evaluate the
+      sensitivity of this information in their implementation context, and
+      apply the data-at-rest storage guidance in Section 11.8 of <xref
+      target="RFC7011"/> as appropriate.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include='reference.RFC.2119'?>
+
+      <?rfc include='reference.RFC.7011'?>
+
+      <?rfc include='reference.RFC.7012'?>
+
+      <?rfc include='reference.RFC.8174'?>
+
+      <?rfc include='reference.RFC.8126'?>
+
+      <reference anchor="TS.29281" quoteTitle="true" derivedAnchor="TS.29281">
+        <front>
+          <title>General Packet Radio System (GPRS) Tunnelling Protocol User Plane (GTPv1-U)</title>
+          <author>
+            <organization showOnFrontPage="true">3GPP</organization>
+          </author>
+          <date month="October" year="2022"/>
+        </front>
+        <seriesInfo name="3GPP TS" value="29.281"/>
+        <refcontent>Version 17.4.0</refcontent>
+      </reference>
+
+      <reference anchor="TS.38415" quoteTitle="true" derivedAnchor="TS.38415">
+        <front>
+          <title>NG-RAN; PDU Session User Plane Protocol)</title>
+          <author>
+            <organization showOnFrontPage="true">3GPP</organization>
+          </author>
+          <date month="February" year="2024"/>
+        </front>
+        <seriesInfo name="3GPP TS" value="38.415"/>
+        <refcontent>Version 17.1.0</refcontent>
+      </reference>
+    </references>
+
+    <references title="Informative References">
+      <reference anchor="IANA-IPFIX"
+                 target="https://www.iana.org/assignments/ipfix/ipfix.xhtml">
+        <front>
+          <title>IANA, "IP Flow Information Export (IPFIX) Entities"</title>
+
+          <author/>
+
+          <date/>
+        </front>
+      </reference>
+    </references>
+
+    <section anchor="Encoding-Example" title="IPFIX Encoding Examples">
+      <t>In this section, an example is provided to show IPFIX encoding format
+      for the GTP-U introduced IEs. Template definition and data set
+      corresponding to an observed GTP-U header is illustrated below.</t>
+
+      <t><figure>
+          <artwork><![CDATA[
+
+          Observed GTP-U Header:
+          Flags = 0x36, Message Type = 0xff, TEID = 0x1,
+          Sequence number = 0x0000,
+          Next extension header type = 0x85 (PDU Session container),
+          PDU Type = 0, QFI = 8
+
+       ]]></artwork>
+        </figure></t>
+
+      <section anchor="Three-Observed-SRH-Headers-and-their-routing-protocol"
+               title="Template Record">
+        <section anchor="Template-Record-and-Data-Set-with-BasicList"
+                 title="Template Record and Data Set">
+          <t>Sample template consisting of the GTP-U IEs:</t>
+
+          <t><figure>
+              <artwork><![CDATA[
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          SET ID = 2           |       Length = 32             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |      Template ID = 256        |      Field Count = 6          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|  gtpuFlags = TBD1           |      Field Length = 1         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|  gtpuMsgType = TBD2         |      Field Length = 1         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|  gtpuTEid = TBD3            |      Field Length = 4         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|  gtpuSequenceNum = TBD4     |      Field Length = 2         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|  gtpuQFI = TBD5             |      Field Length = 1         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|  gtpuPduType = TBD6         |      Field Length = 1         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+        Figure 1: Sample Template Record
+
+            ]]></artwork>
+            </figure></t>
+
+          <t>In this example, the Template ID is 256, which will be used in
+          the Data Record.</t>
+
+          <t>The data set is represented as follows:</t>
+
+          <figure>
+            <artwork><![CDATA[
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |         SET ID = 256          |           Length = 14         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | gtpuFlags     |  gtpuMsgType  |      gtpuTEid = 0x1           |
+   | = 0x36        |  = 0xff       |                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                               |   gtpuSequenceNum = 0x0000    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | gtpuQFI = 8   | gtpuPduType   |
+   |               | = 0           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+           Figure 2: Data Set Encoding Format
+
+           ]]></artwork>
+          </figure>
+        </section>
+      </section>
+    </section>
+  </back>
+</rfc>
