@@ -5,13 +5,13 @@
 Operations                                                      D. Voyer
 Internet-Draft                                               Bell Canada
 Intended status: Standards Track                       S. Gopalakrishnan
-Expires: 11 August 2024                                         R. Johny
+Expires: 25 August 2024                                         R. Johny
                                                            Cisco Systems
                                                                  T. Graf
                                                                 Swisscom
                                                                B. Claise
                                                                   Huawei
-                                                         8 February 2024
+                                                        22 February 2024
 
 
    Export of GTP-U Information in IP Flow Information Export (IPFIX)
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 August 2024.
+   This Internet-Draft will expire on 25 August 2024.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Voyer, et al.            Expires 11 August 2024                 [Page 1]
+Voyer, et al.            Expires 25 August 2024                 [Page 1]
 
 Internet-Draft           IPFIX support for GTP-U           February 2024
 
@@ -74,7 +74,7 @@ Table of Contents
      5.1.  gtpuFlags . . . . . . . . . . . . . . . . . . . . . . . .   5
      5.2.  gtpuMsgType . . . . . . . . . . . . . . . . . . . . . . .   6
      5.3.  gtpuTEid  . . . . . . . . . . . . . . . . . . . . . . . .   6
-     5.4.  gtpuSequenceNum . . . . . . . . . . . . . . . . . . . . .   6
+     5.4.  gtpuSequenceNum . . . . . . . . . . . . . . . . . . . . .   7
      5.5.  gtpuQFI . . . . . . . . . . . . . . . . . . . . . . . . .   7
      5.6.  gtpuPduType . . . . . . . . . . . . . . . . . . . . . . .   7
    6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
@@ -84,8 +84,8 @@ Table of Contents
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .   8
      9.2.  Informative References  . . . . . . . . . . . . . . . . .   9
    Appendix A.  IPFIX Encoding Examples  . . . . . . . . . . . . . .   9
-     A.1.  Template Record . . . . . . . . . . . . . . . . . . . . .   9
-       A.1.1.  Template Record and Data Set  . . . . . . . . . . . .   9
+     A.1.  Template Record . . . . . . . . . . . . . . . . . . . . .  10
+       A.1.1.  Template Record and Data Set  . . . . . . . . . . . .  10
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
 
 1.  Introduction
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Voyer, et al.            Expires 11 August 2024                 [Page 2]
+Voyer, et al.            Expires 25 August 2024                 [Page 2]
 
 Internet-Draft           IPFIX support for GTP-U           February 2024
 
@@ -157,21 +157,25 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
       protocol entity for a given UDP/IP endpoint.
 
    gtpuSequenceNum
-      16-bit sequence number field defined in the GTP-U.
-
-   gtpuQFI
-      8-bit QoS flow identifier field defined in PDU Session Container
-      extension header of GTP-U.
+      16-bit sequence number field defined in the GTP-U.  This field is
+      interpreted based on the corresponding flag value from gtpuFlags.
 
 
 
-Voyer, et al.            Expires 11 August 2024                 [Page 3]
+
+
+
+Voyer, et al.            Expires 25 August 2024                 [Page 3]
 
 Internet-Draft           IPFIX support for GTP-U           February 2024
 
 
+   gtpuQFI
+      6-bit QoS flow identifier field defined in PDU Session Container
+      extension header of GTP-U.
+
    gtpuPduType
-      8-bit PDU Type field defined in PDU Session Container extension
+      4-bit PDU Type field defined in PDU Session Container extension
       header of GTP-U.
 
 4.  Sample Use Cases
@@ -217,11 +221,7 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
 
 
-
-
-
-
-Voyer, et al.            Expires 11 August 2024                 [Page 4]
+Voyer, et al.            Expires 25 August 2024                 [Page 4]
 
 Internet-Draft           IPFIX support for GTP-U           February 2024
 
@@ -265,22 +265,25 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    ElementID:  TBD1
 
-   Description:  8-bit flags field defined in section 5.1 of
-      GTP-U spec [TS.29281].
+   Description:  8-bit flags field indicating the version of GTP-U
+      protocol, protocol type and presence of extension header, sequence
+      number and N-PDU number defined in section 5.1 of the 3GPP
+      specification [TS.29281].
 
    Abstract Data Type:  unsigned8
 
    Data Type Semantics:  flags
 
-   Additional Information:  Refer section 5.1 in [TS.29281].
 
 
 
-
-Voyer, et al.            Expires 11 August 2024                 [Page 5]
+Voyer, et al.            Expires 25 August 2024                 [Page 5]
 
 Internet-Draft           IPFIX support for GTP-U           February 2024
 
+
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
 
    Reference:  [RFC-to-be]
 
@@ -290,14 +293,16 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    ElementID:  TBD2
 
-   Description:  8-bit message type field defined in section 5.1 of
-      GTP-U spec [TS.29281].
+   Description:  8-bit Message type field indicating the type of GTP-U
+      message defined in section 5.1 of the 3GPP specification
+      [TS.29281].
 
    Abstract Data Type:  unsigned8
 
    Data Type Semantics:  identifier
 
-   Additional Information:  Refer section 5.1 in [TS.29281].
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
 
    Reference:  [RFC-to-be]
 
@@ -308,20 +313,30 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
    ElementID:  TBD3
 
    Description:  32-bit tunnel endpoint identifier field defined in
-      section 5.1 of GTP-U spec [TS.29281].  This field unambiguously
-      identifies a tunnel endpoint in the receiving GTP-U protocol
-      entity for a given UDP/IP endpoint.  The receiving end side of a
-      GTP tunnel locally assigns the TEID value the transmitting side
-      has to use.  The TEID values are exchanged between tunnel
-      endpoints using control plane messages.
+      section 5.1 of the 3GPP specification [TS.29281].  This field
+      unambiguously identifies a tunnel endpoint in the receiving GTP-U
+      protocol entity for a given UDP/IP endpoint.  The receiving end
+      side of a GTP tunnel locally assigns the TEID value the
+      transmitting side has to use.  The TEID values are exchanged
+      between tunnel endpoints using control plane messages.
 
    Abstract Data Type:  unsigned32
 
    Data Type Semantics:  identifier
 
-   Additional Information:  Refer section 5.1 in [TS.29281].
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
 
    Reference:  [RFC-to-be]
+
+
+
+
+
+Voyer, et al.            Expires 25 August 2024                 [Page 6]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
 
 5.4.  gtpuSequenceNum
 
@@ -329,22 +344,15 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    ElementID:  TBD4
 
-   Description:  16-bit sequence number field defined in section 5.1 of
-
-
-
-Voyer, et al.            Expires 11 August 2024                 [Page 6]
-
-Internet-Draft           IPFIX support for GTP-U           February 2024
-
-
-      GTP-U spec [TS.29281].
+   Description:  16-bit sequence number field defined in section 5.1
+      (Optional Fields) of the 3GPP specification [TS.29281].
 
    Abstract Data Type:  unsigned16
 
    Data Type Semantics:  identifier
 
-   Additional Information:  Refer [TS.29281].
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
 
    Reference:  [RFC-to-be]
 
@@ -354,17 +362,19 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    ElementID:  TBD5
 
-   Description:  8-bit QoS flow identifier field defined in PDU Session
+   Description:  6-bit QoS flow identifier field defined in PDU Session
       Container extension header of GTP-U.  This is defined in section
-      5.5.3 of PDU session spec [TS.38415].  This is used to determine
-      the QoS flow and QoS profile which are associated with the
-      received packet.
+      5.5.3.3 of the 3GPP specification [TS.38415].  This is used to
+      determine the QoS flow and QoS profile which are associated with
+      the received packet.
 
    Abstract Data Type:  unsigned8
 
    Data Type Semantics:  identifier
 
-   Additional Information:  Refer section 5.5.3 in [TS.38415].
+   Additional Information:  Refer to section 5.5.3.3 of the 3GPP
+      specification [TS.38415] and section 5.7.1.1 from 3GPP
+      specification [TS.23501] for additional details.
 
    Reference:  [RFC-to-be]
 
@@ -374,25 +384,28 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    ElementID:  TBD6
 
-   Description:  8-bit PDU type field defined in PDU Session Container
+   Description:  4-bit PDU type field defined in PDU Session Container
+
+
+
+
+Voyer, et al.            Expires 25 August 2024                 [Page 7]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
       extension header of GTP-U.  This is defined in section 5.5.3 of
-      PDU session spec [TS.38415].  This field indicates the structure
-      of the PDU session UP frame.
+      the 3GPP specification [TS.38415].  This field indicates the
+      structure of the PDU session user plane frame.
 
    Abstract Data Type:  unsigned8
 
    Data Type Semantics:  identifier
 
-   Additional Information:  Refer section 5.5.3 in [TS.38415].
+   Additional Information:  Refer to section 5.5.3 of the 3GPP
+      specification [TS.38415].
 
    Reference:  [RFC-to-be]
-
-
-
-Voyer, et al.            Expires 11 August 2024                 [Page 7]
-
-Internet-Draft           IPFIX support for GTP-U           February 2024
-
 
 6.  Acknowledgements
 
@@ -427,6 +440,16 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
 9.1.  Normative References
 
+
+
+
+
+
+Voyer, et al.            Expires 25 August 2024                 [Page 8]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -443,13 +466,6 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
               DOI 10.17487/RFC7012, September 2013,
               <https://www.rfc-editor.org/info/rfc7012>.
 
-
-
-Voyer, et al.            Expires 11 August 2024                 [Page 8]
-
-Internet-Draft           IPFIX support for GTP-U           February 2024
-
-
    [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
               Writing an IANA Considerations Section in RFCs", BCP 26,
               RFC 8126, DOI 10.17487/RFC8126, June 2017,
@@ -458,6 +474,9 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [TS.23501] 3GPP, "5G; System architecture for the 5G System (5GS)",
+              Version 17.11.0, 3GPP TS 23.501, January 2024.
 
    [TS.29281] 3GPP, "General Packet Radio System (GPRS) Tunnelling
               Protocol User Plane (GTPv1-U)", Version 17.4.0, 3GPP
@@ -478,6 +497,15 @@ Appendix A.  IPFIX Encoding Examples
    for the GTP-U introduced IEs.  Template definition and data set
    corresponding to an observed GTP-U header is illustrated below.
 
+
+
+
+
+Voyer, et al.            Expires 25 August 2024                 [Page 9]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
              Observed GTP-U Header:
              Flags = 0x36, Message Type = 0xff, TEID = 0x1,
              Sequence number = 0x0000,
@@ -490,21 +518,6 @@ A.1.  Template Record
 A.1.1.  Template Record and Data Set
 
    Sample template consisting of the GTP-U IEs:
-
-
-
-
-
-
-
-
-
-
-
-Voyer, et al.            Expires 11 August 2024                 [Page 9]
-
-Internet-Draft           IPFIX support for GTP-U           February 2024
-
 
        0                   1                   2                   3
        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -534,6 +547,21 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
    The data set is represented as follows:
 
+
+
+
+
+
+
+
+
+
+
+Voyer, et al.            Expires 25 August 2024                [Page 10]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
        0                   1                   2                   3
        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -551,15 +579,6 @@ Internet-Draft           IPFIX support for GTP-U           February 2024
 
 
               Figure 2: Data Set Encoding Format
-
-
-
-
-
-
-Voyer, et al.            Expires 11 August 2024                [Page 10]
-
-Internet-Draft           IPFIX support for GTP-U           February 2024
 
 
 Authors' Addresses
@@ -594,23 +613,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Voyer, et al.            Expires 11 August 2024                [Page 11]
+Voyer, et al.            Expires 25 August 2024                [Page 11]
