@@ -138,13 +138,14 @@
           entity for a given UDP/IP endpoint.</t>
 
           <t hangText="gtpuSequenceNum"><vspace blankLines="0"/> 16-bit
-          sequence number field defined in the GTP-U.</t>
+          sequence number field defined in the GTP-U. This field is interpreted
+          based on the corresponding flag value from gtpuFlags.</t>
 
-          <t hangText="gtpuQFI"><vspace blankLines="0"/> 8-bit QoS flow
+          <t hangText="gtpuQFI"><vspace blankLines="0"/> 6-bit QoS flow
           identifier field defined in PDU Session Container extension header
           of GTP-U.</t>
 
-          <t hangText="gtpuPduType"><vspace blankLines="0"/> 8-bit PDU Type
+          <t hangText="gtpuPduType"><vspace blankLines="0"/> 4-bit PDU Type
           field defined in PDU Session Container extension header of
           GTP-U.</t>
         </list></t>
@@ -241,8 +242,10 @@
           <dl>
             <dt>Description:</dt>
 
-            <dd>8-bit flags field defined in section 5.1
-            of GTP-U spec <xref target="TS.29281"/>.</dd>
+            <dd>8-bit flags field indicating the version of GTP-U
+            protocol,  protocol type and presence of extension header,
+            sequence number and N-PDU number defined in section 5.1
+            of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -260,7 +263,7 @@
           <dl>
             <dt>Additional Information:</dt>
 
-            <dd>Refer section 5.1 in <xref target="TS.29281"/>.</dd>
+            <dd>Refer to section 5.1 of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -286,8 +289,8 @@
           <dl>
             <dt>Description:</dt>
 
-            <dd>8-bit message type field defined in section 5.1
-            of GTP-U spec <xref target="TS.29281"/>.</dd>
+            <dd>8-bit Message type field indicating the type of GTP-U
+            message defined in section 5.1 of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -305,7 +308,7 @@
           <dl>
             <dt>Additional Information:</dt>
 
-            <dd>Refer section 5.1 in <xref target="TS.29281"/>.</dd>
+            <dd>Refer to section 5.1 of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -332,7 +335,7 @@
             <dt>Description:</dt>
 
             <dd>32-bit tunnel endpoint identifier field defined
-            in section 5.1 of GTP-U spec <xref target="TS.29281"/>.
+            in section 5.1 of the 3GPP specification <xref target="TS.29281"/>.
             This field unambiguously identifies a tunnel
             endpoint in the receiving GTP-U protocol entity for a
             given UDP/IP endpoint. The receiving end side of a GTP
@@ -356,7 +359,7 @@
           <dl>
             <dt>Additional Information:</dt>
 
-            <dd>Refer section 5.1 in <xref target="TS.29281"/>.</dd>
+            <dd>Refer to section 5.1 of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -383,7 +386,7 @@
             <dt>Description:</dt>
 
             <dd>16-bit sequence number field defined in section 5.1
-            of GTP-U spec <xref target="TS.29281"/>.</dd>
+            (Optional Fields) of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -401,7 +404,7 @@
           <dl>
             <dt>Additional Information:</dt>
 
-            <dd>Refer <xref target="TS.29281"/>.</dd>
+            <dd>Refer to section 5.1 of the 3GPP specification <xref target="TS.29281"/>.</dd>
           </dl>
 
           <dl>
@@ -427,11 +430,11 @@
           <dl>
             <dt>Description:</dt>
 
-            <dd>8-bit QoS flow identifier field defined in PDU Session
+            <dd>6-bit QoS flow identifier field defined in PDU Session
             Container extension header of GTP-U. This is defined in section
-            5.5.3 of PDU session spec <xref target="TS.38415"/>. This is used
-            to determine the QoS flow and QoS profile which are associated
-            with the received packet. </dd>
+            5.5.3.3 of the 3GPP specification <xref target="TS.38415"/>.
+            This is used to determine the QoS flow and QoS profile which
+            are associated with the received packet. </dd>
           </dl>
 
           <dl>
@@ -449,7 +452,9 @@
           <dl>
             <dt>Additional Information:</dt>
 
-            <dd>Refer section 5.5.3 in <xref target="TS.38415"/>.</dd>
+            <dd>Refer to section 5.5.3.3 of the 3GPP specification
+            <xref target="TS.38415"/> and section 5.7.1.1 from 3GPP
+            specification <xref target="TS.23501"/> for additional details.</dd>
           </dl>
 
           <dl>
@@ -475,10 +480,10 @@
           <dl>
             <dt>Description:</dt>
 
-            <dd>8-bit PDU type field defined in PDU Session Container
+            <dd>4-bit PDU type field defined in PDU Session Container
             extension header of GTP-U. This is defined in section
-            5.5.3 of PDU session spec <xref target="TS.38415"/>. This
-            field indicates the structure of the PDU session UP frame.</dd>
+            5.5.3 of the 3GPP specification <xref target="TS.38415"/>. This
+            field indicates the structure of the PDU session user plane frame.</dd>
           </dl>
 
           <dl>
@@ -496,7 +501,7 @@
           <dl>
             <dt>Additional Information:</dt>
 
-            <dd>Refer section 5.5.3 in <xref target="TS.38415"/>.</dd>
+            <dd>Refer to section 5.5.3 of the 3GPP specification <xref target="TS.38415"/>.</dd>
           </dl>
 
           <dl>
@@ -575,6 +580,18 @@
         </front>
         <seriesInfo name="3GPP TS" value="38.415"/>
         <refcontent>Version 17.1.0</refcontent>
+      </reference>
+
+      <reference anchor="TS.23501" quoteTitle="true" derivedAnchor="TS.23501">
+        <front>
+          <title>5G; System architecture for the 5G System (5GS) </title>
+          <author>
+            <organization showOnFrontPage="true">3GPP</organization>
+          </author>
+          <date month="January" year="2024"/>
+        </front>
+        <seriesInfo name="3GPP TS" value="23.501"/>
+        <refcontent>Version 17.11.0</refcontent>
       </reference>
     </references>
 
