@@ -1,0 +1,616 @@
+
+
+
+
+Operations                                                      D. Voyer
+Internet-Draft                                               Bell Canada
+Intended status: Standards Track                       S. Gopalakrishnan
+Expires: 26 August 2024                                    Cisco Systems
+                                                                 T. Graf
+                                                                Swisscom
+                                                               B. Claise
+                                                                  Huawei
+                                                             V. Satyanar
+                                                        Juniper Networks
+                                                        23 February 2024
+
+
+   Export of GTP-U Information in IP Flow Information Export (IPFIX)
+                 draft-voyersriram-opsawg-ipfix-gtpu-03
+
+Abstract
+
+   This document introduces IP Flow Information Export Information
+   Elements to identify information contained in the Generic Packet
+   Radio Service Tunneling Protocol User Plane header such as Tunnel
+   Endpoint Identifier, and data contained in its session container
+   extension header.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 26 August 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 1]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  IPFIX GTP-U Information Elements  . . . . . . . . . . . . . .   3
+   4.  Sample Use Cases  . . . . . . . . . . . . . . . . . . . . . .   4
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   4
+     5.1.  gtpuFlags . . . . . . . . . . . . . . . . . . . . . . . .   5
+     5.2.  gtpuMsgType . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.3.  gtpuTEid  . . . . . . . . . . . . . . . . . . . . . . . .   6
+     5.4.  gtpuSequenceNum . . . . . . . . . . . . . . . . . . . . .   7
+     5.5.  gtpuQFI . . . . . . . . . . . . . . . . . . . . . . . . .   7
+     5.6.  gtpuPduType . . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   8
+   7.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .   8
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   8
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .   9
+   Appendix A.  IPFIX Encoding Examples  . . . . . . . . . . . . . .   9
+     A.1.  Template Record . . . . . . . . . . . . . . . . . . . . .  10
+       A.1.1.  Template Record and Data Set  . . . . . . . . . . . .  10
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+
+1.  Introduction
+
+   A dedicated header, called GPRS Tunneling Protocol Header (GTP), is
+   defined by 3GPP for use of GTP-C Control plane and GTP-U User Plane
+   [TS.29281] traffic of mobile subscribers.
+
+   This document specifies six IPFIX Information Elements (IEs)
+   [RFC7012] for fields within a GTP-U header.
+
+   These IEs are used to export the GTP-U Tunnel Endpoint Identifier
+   (TEID), QoS Flow Identifier (QFI) and PDU Type from the PDU Session
+   Container extension header.
+
+   Some examples are provided in Appendix A.
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 2]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+2.  Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document makes use of the terms defined in [RFC7011]
+
+   *  IPFIX
+
+   *  IPFIX Information Elements
+
+   *  Template
+
+   *  Template Record
+
+   *  Options Template
+
+   *  Options Template Record
+
+   *  Data Record
+
+   *  Data Set
+
+3.  IPFIX GTP-U Information Elements
+
+   This section defines IPFIX IEs corresponding to various fields in the
+   GTP-U.
+
+   gtpuFlags
+      8-bit flags field defined in the GTP-U.
+
+   gtpuMsgType
+      8-bit message type field defined in the GTP-U.
+
+   gtpuTEid
+      32-bit tunnel endpoint identifier field defined in GTP-U which
+      unambiguously identifies a tunnel endpoint in the receiving GTP-U
+      protocol entity for a given UDP/IP endpoint.
+
+   gtpuSequenceNum
+      16-bit sequence number field defined in the GTP-U.  This field is
+      interpreted based on the corresponding flag value from gtpuFlags.
+
+
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 3]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+   gtpuQFI
+      6-bit QoS flow identifier field defined in PDU Session Container
+      extension header of GTP-U.
+
+   gtpuPduType
+      4-bit PDU Type field defined in PDU Session Container extension
+      header of GTP-U.
+
+4.  Sample Use Cases
+
+   In order to identify the transport performance of PDU Sessions with
+   specific QoS within a slice or within a group of slices hosted on the
+   same UPF the GTP User Plane related IEs would be much helpful.
+
+   For example when in case of one or a couple of dedicated UPFs are
+   deployed per 5G slice, the slice is identified first using list of
+   gNodeB IPs composing the slice and list of IPs of User Plane Function
+   dedicated for the slice.  The gNodeB and the User Plane Function form
+   the tunnel endpoints.  Also the traffic for individual PDU session
+   per direction is identified using the GTP-U TEID, GTP-U PDU Type
+   together with above mentioned tunnel endpoints.  Further the traffic
+   for specific QoS within a PDU session per direction is identified
+   using the combination of GTP-U TEID, GTP-U PDU Type and GTP-U QFI
+   attributes.  It is possible that there may be multiple IP flows
+   having the same attributes.
+
+   In another scenario when multiple 5G slices are served by the same
+   User Plane Function, the slice is identified using a separated list
+   of gNodeB IPv6 addresses per slice.  If Intermediate User Plane
+   Function or Uplink Classifier is deployed there is an addition of a
+   GTP-U tunnel between the Intermediate/Uplink-Classifier UPF and the
+   final UPF.  These brings a challenge for identifying the end to end
+   path for a certain PDU session - where the GTP-U PDU Type and GTP-U
+   QFI attributes from the gNodeB and Intermediate/Uplink-Classifier UPF
+   tunnel will be the same on the Intermediate/Uplink-Classifier and
+   final UPF tunnel, however the GTP-U TEIDs will be different since
+   this is a different tunnel.
+
+5.  IANA Considerations
+
+   This document requests IANA to add the IEs listed in Table 1 below to
+   the "IPFIX Information Elements" registry [RFC7012] available at
+   [IANA-IPFIX].
+
+   Table 1 lists the GTP-U IEs:
+
+
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 4]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+        +-------+-----------------+
+        |Element| Name            |
+        |       |                 |
+        |   ID  |                 |
+        |       |                 |
+        +-------+-----------------+
+        | TBD1  | gtpuFlags       |
+        |       |                 |
+        +-------+-----------------+
+        | TBD2  | gtpuMsgType     |
+        |       |                 |
+        +-------+-----------------+
+        | TBD3  | gtpuTEid        |
+        |       |                 |
+        |       |                 |
+        +-------+-----------------+
+        | TBD4  | gtpuSequenceNum |
+        |       |                 |
+        +-------+-----------------+
+        | TBD5  | gtpuQFI         |
+        |       |                 |
+        |       |                 |
+        |       |                 |
+        |       |                 |
+        +-------+-----------------+
+        | TBD6  | gtpuPduType     |
+        |       |                 |
+        |       |                 |
+        |       |                 |
+        +-------+-----------------+
+
+     Table 1: GTP-U IEs in the "IPFIX Information Elements" Registry
+
+5.1.  gtpuFlags
+
+   Name:  gtpuFlags
+
+   ElementID:  TBD1
+
+   Description:  8-bit flags field indicating the version of GTP-U
+      protocol, protocol type and presence of extension header, sequence
+      number and N-PDU number defined in section 5.1 of the 3GPP
+      specification [TS.29281].
+
+   Abstract Data Type:  unsigned8
+
+   Data Type Semantics:  flags
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 5]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
+
+   Reference:  [RFC-to-be]
+
+5.2.  gtpuMsgType
+
+   Name:  gtpuMsgType
+
+   ElementID:  TBD2
+
+   Description:  8-bit Message type field indicating the type of GTP-U
+      message defined in section 5.1 of the 3GPP specification
+      [TS.29281].
+
+   Abstract Data Type:  unsigned8
+
+   Data Type Semantics:  identifier
+
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
+
+   Reference:  [RFC-to-be]
+
+5.3.  gtpuTEid
+
+   Name:  gtpuTEid
+
+   ElementID:  TBD3
+
+   Description:  32-bit tunnel endpoint identifier field defined in
+      section 5.1 of the 3GPP specification [TS.29281].  This field
+      unambiguously identifies a tunnel endpoint in the receiving GTP-U
+      protocol entity for a given UDP/IP endpoint.  The receiving end
+      side of a GTP tunnel locally assigns the TEID value the
+      transmitting side has to use.  The TEID values are exchanged
+      between tunnel endpoints using control plane messages.
+
+   Abstract Data Type:  unsigned32
+
+   Data Type Semantics:  identifier
+
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
+
+   Reference:  [RFC-to-be]
+
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 6]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+5.4.  gtpuSequenceNum
+
+   Name:  gtpuSequenceNum
+
+   ElementID:  TBD4
+
+   Description:  16-bit sequence number field defined in section 5.1
+      (Optional Fields) of the 3GPP specification [TS.29281].
+
+   Abstract Data Type:  unsigned16
+
+   Data Type Semantics:  identifier
+
+   Additional Information:  Refer to section 5.1 of the 3GPP
+      specification [TS.29281].
+
+   Reference:  [RFC-to-be]
+
+5.5.  gtpuQFI
+
+   Name:  gtpuQFI
+
+   ElementID:  TBD5
+
+   Description:  6-bit QoS flow identifier field defined in PDU Session
+      Container extension header of GTP-U.  This is defined in section
+      5.5.3.3 of the 3GPP specification [TS.38415].  This is used to
+      determine the QoS flow and QoS profile which are associated with
+      the received packet.
+
+   Abstract Data Type:  unsigned8
+
+   Data Type Semantics:  identifier
+
+   Additional Information:  Refer to section 5.5.3.3 of the 3GPP
+      specification [TS.38415] and section 5.7.1.1 from 3GPP
+      specification [TS.23501] for additional details.
+
+   Reference:  [RFC-to-be]
+
+5.6.  gtpuPduType
+
+   Name:  gtpuPduType
+
+   ElementID:  TBD6
+
+   Description:  4-bit PDU type field defined in PDU Session Container
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 7]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+      extension header of GTP-U.  This is defined in section 5.5.3 of
+      the 3GPP specification [TS.38415].  This field indicates the
+      structure of the PDU session user plane frame.
+
+   Abstract Data Type:  unsigned8
+
+   Data Type Semantics:  identifier
+
+   Additional Information:  Refer to section 5.5.3 of the 3GPP
+      specification [TS.38415].
+
+   Reference:  [RFC-to-be]
+
+6.  Acknowledgements
+
+   The authors would like to thank Ketan Talaulikar and Dhananjay Patki
+   for their reviews and valuable comments.
+
+7.  Contributors
+
+   Cristian Staicu
+   Bell Canada
+   Email: cristian.staicu@bell.ca
+
+
+   Kandhla Chandi
+   Bell Canada
+   Email: kandhla.chandi@bell.ca
+
+
+   Ralu Johny
+   Cisco
+   Email: rjohny@cisco.com
+
+
+8.  Security Considerations
+
+   There exists no extra security considerations regarding allocation of
+   these IPFIX IEs compared to [RFC7012].
+
+   The IEs described in this document export GTP user plane data metrics
+   on how packets are being forwarded in 5G network.  Applications and
+   operators using the IEs described in this document must evaluate the
+   sensitivity of this information in their implementation context, and
+   apply the data-at-rest storage guidance in Section 11.8 of [RFC7011]
+   as appropriate.
+
+9.  References
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 8]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+9.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC7011]  Claise, B., Ed., Trammell, B., Ed., and P. Aitken,
+              "Specification of the IP Flow Information Export (IPFIX)
+              Protocol for the Exchange of Flow Information", STD 77,
+              RFC 7011, DOI 10.17487/RFC7011, September 2013,
+              <https://www.rfc-editor.org/info/rfc7011>.
+
+   [RFC7012]  Claise, B., Ed. and B. Trammell, Ed., "Information Model
+              for IP Flow Information Export (IPFIX)", RFC 7012,
+              DOI 10.17487/RFC7012, September 2013,
+              <https://www.rfc-editor.org/info/rfc7012>.
+
+   [RFC8126]  Cotton, M., Leiba, B., and T. Narten, "Guidelines for
+              Writing an IANA Considerations Section in RFCs", BCP 26,
+              RFC 8126, DOI 10.17487/RFC8126, June 2017,
+              <https://www.rfc-editor.org/info/rfc8126>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [TS.23501] 3GPP, "5G; System architecture for the 5G System (5GS)",
+              Version 17.11.0, 3GPP TS 23.501, January 2024.
+
+   [TS.29281] 3GPP, "General Packet Radio System (GPRS) Tunnelling
+              Protocol User Plane (GTPv1-U)", Version 17.4.0, 3GPP
+              TS 29.281, October 2022.
+
+   [TS.38415] 3GPP, "NG-RAN; PDU Session User Plane Protocol)", Version
+              17.1.0, 3GPP TS 38.415, February 2024.
+
+9.2.  Informative References
+
+   [IANA-IPFIX]
+              "IANA, "IP Flow Information Export (IPFIX) Entities"",
+              <https://www.iana.org/assignments/ipfix/ipfix.xhtml>.
+
+Appendix A.  IPFIX Encoding Examples
+
+   In this section, an example is provided to show IPFIX encoding format
+   for the GTP-U introduced IEs.  Template definition and data set
+   corresponding to an observed GTP-U header is illustrated below.
+
+
+
+Voyer, et al.            Expires 26 August 2024                 [Page 9]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+             Observed GTP-U Header:
+             Flags = 0x36, Message Type = 0xff, TEID = 0x1,
+             Sequence number = 0x0000,
+             Next extension header type = 0x85 (PDU Session container),
+             PDU Type = 0, QFI = 8
+
+
+A.1.  Template Record
+
+A.1.1.  Template Record and Data Set
+
+   Sample template consisting of the GTP-U IEs:
+
+       0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |          SET ID = 2           |       Length = 32             |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |      Template ID = 256        |      Field Count = 6          |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |0|  gtpuFlags = TBD1           |      Field Length = 1         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |0|  gtpuMsgType = TBD2         |      Field Length = 1         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |0|  gtpuTEid = TBD3            |      Field Length = 4         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |0|  gtpuSequenceNum = TBD4     |      Field Length = 2         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |0|  gtpuQFI = TBD5             |      Field Length = 1         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |0|  gtpuPduType = TBD6         |      Field Length = 1         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+           Figure 1: Sample Template Record
+
+
+   In this example, the Template ID is 256, which will be used in the
+   Data Record.
+
+   The data set is represented as follows:
+
+
+
+
+
+
+
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                [Page 10]
+
+Internet-Draft           IPFIX support for GTP-U           February 2024
+
+
+       0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |         SET ID = 256          |           Length = 14         |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      | gtpuFlags     |  gtpuMsgType  |      gtpuTEid = 0x1           |
+      | = 0x36        |  = 0xff       |                               |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |                               |   gtpuSequenceNum = 0x0000    |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      | gtpuQFI = 8   | gtpuPduType   |
+      |               | = 0           |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+
+              Figure 2: Data Set Encoding Format
+
+
+Authors' Addresses
+
+   Daniel Voyer
+   Bell Canada
+   Email: daniel.voyer@bell.ca
+
+
+   Sriram Gopalakrishnan
+   Cisco Systems
+   India
+   Email: sriragop@cisco.com
+
+
+   Thomas Graf
+   Swisscom
+   Email: thomas.graf@swisscom.com
+
+
+   Benoit Claise
+   Huawei
+   Email: benoit.claise@huawei.com
+
+
+   Vyasraj Satyanar
+   Juniper Networks
+   Email: vyasraj@juniper.net
+
+
+
+
+
+
+Voyer, et al.            Expires 26 August 2024                [Page 11]
